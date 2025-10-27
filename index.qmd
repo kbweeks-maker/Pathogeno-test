@@ -14,8 +14,4 @@ execute:
 
 # Index
 
-\[Lab7\](QuartoLab.html)
-
-```{r}
-library(tidyverse)
-```
+[Lab7](Lab 7.html)
