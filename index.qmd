@@ -1,0 +1,21 @@
+---
+title: "Lab S3 Github"
+author: "Kaleigh Weeks"
+format:
+  html:
+    toc: true
+    toc_float: true
+    embed-resources: true
+    theme: cosmos
+execute: 
+  warning: false
+  message: false
+---
+
+# Index
+
+\[Lab7\](QuartoLab.html)
+
+```{r}
+library(tidyverse)
+```
