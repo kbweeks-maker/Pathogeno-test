@@ -1,0 +1,153 @@
+---
+title: "Lab13"
+author: "Kaleigh Weeks"
+format:
+  html:
+    toc: true
+    toc_float: true
+    embed-resources: true
+execute: 
+  warning: false
+  message: false
+---
+
+## Lab 13
+
+```{r}
+df <- data.table::fread("NEON_soilMAGs_soilChem.csv", na.strings = c("", "NA"))
+
+```
+
+# Comparison of Taxa Diversity
+
+```{r}
+# Load libraries
+library(ggplot2)
+library(reshape2)
+
+# Example dataset: replace with your actual counts
+# Rows = sites, columns = categories (counts of taxa per category)
+community_data <- data.frame(
+  Site = c("Site1", "Site2", "Site3"),
+  Composition = c(10, 8, 12),
+  Correlations = c(5, 7, 4),
+  Biogeography = c(6, 3, 5),
+  Co_occurrence = c(4, 6, 7)
+)
+
+# Reshape to long format for ggplot
+comm_long <- melt(community_data, id.vars = "Site",
+                  variable.name = "Category", value.name = "Count")
+
+# Stacked bar plot
+ggplot(comm_long, aes(x = Site, y = Count, fill = Category)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Community Composition Across Sites",
+       x = "Site", y = "Number of Taxa",
+       fill = "Category") +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+```
+
+This graph shows how each category contributes to each site.
+
+## Environmental correlations with MAG categorizes
+
+```{r}
+# Load libraries
+library(ggplot2)
+library(reshape2)
+
+# Example dataset: replace with your actual correlations
+# Rows = environmental variables, Columns = categories
+cor_matrix <- data.frame(
+  Variable = c("pH", "Moisture", "Nitrogen", "Carbon"),
+  Community_Composition = c(0.6, -0.2, 0.4, 0.7),
+  Environmental_Correlations = c(0.5, 0.1, 0.3, 0.6),
+  Biogeography = c(-0.3, 0.4, 0.2, -0.1),
+  Co_occurrence = c(0.2, 0.5, -0.4, 0.3)
+)
+
+# Reshape for plotting
+cor_long <- melt(cor_matrix, id.vars = "Variable")
+
+# Heatmap of correlations
+ggplot(cor_long, aes(x = Variable, y = variable, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
+                       name="Correlation") +
+  theme_minimal() +
+  labs(title = "Environmental Correlations with MAG Categories",
+       x = "Environmental Variable",
+       y = "Category") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+This is a heat map that shows the relationship between environmental variables and MAG categories. The more red the color the stronger the correlation.
+
+## Taxa sites and how rich/diverse they are
+
+```{r}
+# Load libraries
+library(ggplot2)
+library(maps)
+
+# Example dataset: replace with your actual site coordinates and richness/diversity values
+biogeo_data <- data.frame(
+  Site = c("Site1", "Site2", "Site3"),
+  Latitude = c(42.3, 39.1, 36.8),   # example latitudes
+  Longitude = c(-72.6, -75.2, -80.0), # example longitudes
+  Richness = c(15, 8, 12)            # number of taxa per site
+)
+
+# Base map of USA (adjust region if needed)
+usa_map <- map_data("state")
+
+# Plot sites with richness as point size
+ggplot() +
+  geom_polygon(data = usa_map, aes(x=long, y=lat, group=group),
+               fill="gray90", color="white") +
+  geom_point(data = biogeo_data, aes(x=Longitude, y=Latitude, size=Richness, color=Richness)) +
+  scale_size_continuous(range=c(3,8)) +
+  scale_color_gradient(low="blue", high="red") +
+  theme_minimal() +
+  labs(title="Biogeography of MAG Richness",
+       x="Longitude", y="Latitude", size="Taxa Richness", color="Taxa Richness")
+
+```
+
+This map shows where each site is located and the size of the dot increases depending on how much diversity that site has.
+
+### Map of microbial relationships
+
+```{r}
+# Load libraries
+library(igraph)
+library(ggraph)
+library(ggplot2)
+
+# Example co-occurrence data (replace with your own)
+# Each row = pair of taxa that co-occur, with a weight (frequency or correlation)
+edges <- data.frame(
+  from = c("TaxonA", "TaxonA", "TaxonB", "TaxonC"),
+  to   = c("TaxonB", "TaxonC", "TaxonC", "TaxonD"),
+  weight = c(3, 5, 2, 4)
+)
+
+# Create graph object
+g <- graph_from_data_frame(edges, directed = FALSE)
+
+# Plot network
+ggraph(g, layout = "fr") +   # "fr" = force-directed layout
+  geom_edge_link(aes(width = weight), alpha = 0.6, color = "darkgray") +
+  geom_node_point(size = 8, color = "steelblue") +
+  geom_node_text(aes(label = name), repel = TRUE, size = 4) +
+  theme_void() +
+  labs(title = "Co-occurrence Network of Taxa")
+
+```
+
+This diagram shows how each taxa is connected and the thickness of each line shows the strength of their co-occurrence.
